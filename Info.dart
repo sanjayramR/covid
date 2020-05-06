@@ -5,6 +5,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 //import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'Questions.dart';
+import 'globals.dart' as globales;
+
 
 
 class Info extends StatelessWidget {
@@ -70,14 +72,8 @@ class _FormdetailsState extends State<Formdetails> {
 
 
   final _formKey = GlobalKey<FormState>();
-
   final _auth = FirebaseAuth.instance;
-  String name;
-  String phoneNo;
-  String age;
-  String occupation;
-  String pincode;
-  String sex;
+
 
   @override
   Widget build(BuildContext context) {
@@ -105,7 +101,7 @@ class _FormdetailsState extends State<Formdetails> {
                   child: Container(
                     child: TextFormField(
                       onChanged: (val) {
-                        name = val;
+                        globales.name = val;
                       },
                       decoration: const InputDecoration(
                           icon: Icon(Icons.person, color: Colors.black, size: 30.0),
@@ -117,7 +113,7 @@ class _FormdetailsState extends State<Formdetails> {
                         Pattern pattern =
                             r'^[ A-Za-z]+(?:[ _-][A-Za-z]+)*$';
                         RegExp regex = new RegExp(pattern);
-                        if (!regex.hasMatch(name))
+                        if (!regex.hasMatch(globales.name))
                           return 'Invalid username';
                         else
                           return null;
@@ -141,7 +137,7 @@ class _FormdetailsState extends State<Formdetails> {
                   child: Container(
                     child: TextFormField(
                       onChanged: (val) {
-                        phoneNo = val;
+                        globales.phoneNo = val;
                       },
                       decoration: const InputDecoration(
                           icon: Icon(Icons.phone, color: Colors.black, size: 30.0),
@@ -153,7 +149,7 @@ class _FormdetailsState extends State<Formdetails> {
                         Pattern pattern =
                             r'^[ 0-9]+(?:[ _-][0-9]+)*$';
                         RegExp regex = new RegExp(pattern);
-                        if (!regex.hasMatch(phoneNO))
+                        if (!regex.hasMatch(globales.phoneNo))
                           return 'Invalid phonenumber';
                         else
                           return null;
@@ -179,7 +175,7 @@ class _FormdetailsState extends State<Formdetails> {
                   child: Container(
                     child: TextFormField(
                       onChanged: (val) {
-                        age = val;
+                        globales.age = val;
                       },
                       decoration: const InputDecoration(
                           icon: Icon(Icons.ac_unit, color: Colors.black, size: 30.0),
@@ -191,7 +187,7 @@ class _FormdetailsState extends State<Formdetails> {
                         Pattern pattern =
                             r'^[ 0-9]+(?:[0-9]+)*$';
                         RegExp regex = new RegExp(pattern);
-                        if (!regex.hasMatch(age))
+                        if (!regex.hasMatch(globales.age))
                           return 'Invalid age';
                         else
                           return null;
@@ -215,7 +211,7 @@ class _FormdetailsState extends State<Formdetails> {
                   child: Container(
                     child: TextFormField(
                       onChanged: (val) {
-                        occupation = val;
+                        globales.occupation = val;
                       },
                       decoration: const InputDecoration(
                           icon: Icon(Icons.work, color: Colors.black, size: 30.0,
@@ -228,7 +224,7 @@ class _FormdetailsState extends State<Formdetails> {
                         Pattern pattern =
                             r'^[ A-Za-z]+(?:[ _-][A-Za-z]+)*$';
                         RegExp regex = new RegExp(pattern);
-                        if (!regex.hasMatch(occupation))
+                        if (!regex.hasMatch(globales.occupation))
                           return 'Invalid Occupation';
                         else
                           return null;
@@ -255,7 +251,7 @@ class _FormdetailsState extends State<Formdetails> {
                   child: Container(
                     child: TextFormField(
                       onChanged: (val) {
-                        pincode = val;
+                        globales.pincode = val;
                       },
                       decoration: const InputDecoration(
                           icon: Icon(Icons.work, color: Colors.black, size: 30.0,
@@ -268,7 +264,7 @@ class _FormdetailsState extends State<Formdetails> {
                         Pattern pattern =
                             r'^[ 0-9]+(?:[ _-][0-9]+)*$';
                         RegExp regex = new RegExp(pattern);
-                        if (!regex.hasMatch(pincode))
+                        if (!regex.hasMatch(globales.pincode))
                           return 'Invalid Pincode';
                         else
                           return null;
@@ -293,7 +289,7 @@ class _FormdetailsState extends State<Formdetails> {
                   child: Container(
                     child: TextFormField(
                       onChanged: (val) {
-                        sex = val;
+                        globales.sex = val;
                       },
                       decoration: const InputDecoration(
                           icon: Icon(Icons.work, color: Colors.black, size: 30.0,
@@ -306,7 +302,7 @@ class _FormdetailsState extends State<Formdetails> {
                         Pattern pattern =
                             r'^[ A-Za-z]+(?:[ _-][A-Za-z]+)*$';
                         RegExp regex = new RegExp(pattern);
-                        if (!regex.hasMatch(sex))
+                        if (!regex.hasMatch(globales.sex))
                           return 'Reenter your sex';
                         else
                           return null;
@@ -321,18 +317,41 @@ class _FormdetailsState extends State<Formdetails> {
                   padding: EdgeInsets.only(left: 130.0, top: 20.0),
                   child: RaisedButton(
                     onPressed: () {
+                     // globales.count=1;
                       if(_formKey.currentState.validate()) {
                         Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => Questions()));
+                            MaterialPageRoute(
+                                builder: (context) => Questions()));
                       }
+                        double data = globales.distance;
+                      print(globales.distance);
+                        double data_meter = data * 1000;
+                        print("meterdistance:$data_meter");
+                        //String i=data_meter.toString();
+                        if (data_meter < 1.0) {
+                          //database
+                          Firestore.instance.collection('info').document(
+                              '${globales.email}')
+                              .collection('Activities')
+                              .getDocuments()
+                              .then((QuerySnapshot snapshot) {
+                            globales.red = snapshot.documents[0]['red'];
+                          });
+                          int r = int.parse(globales.red);
+                          r = r + 1;
+                          globales.red = r.toString();
+                        }
+
                       _fs.collection('info').document('$userName').collection('Activities').document('Activity 1').setData({
                         //'email': userName,
-                        'name': name,
-                        'phone': phoneNo,
-                        'age': age,
-                        'occupation': occupation,
-                        'pincode': pincode,
-                        'sex': sex,
+                        'name': globales.name,
+                        'phone': globales.phoneNo,
+                        'age': globales.age,
+                        'occupation': globales.occupation,
+                        'pincode': globales.pincode,
+                        'sex': globales.sex,
+                        'red':globales.red,
+                        'count':'1',
                       });
                     },
                     child: Text(

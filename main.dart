@@ -1,12 +1,13 @@
 //import 'package:covid/login.dart';
 import 'dart:async';
 import 'dart:convert';
-import 'dart:ffi';
-import 'package:flutter_svg/flutter_svg.dart';
+//import 'dart:ffi';
+//import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+//import 'package:cloud_firestore/cloud_firestore.dart';
 import 'globals.dart'as globales;
 import 'Login.dart';
 import 'Signup.dart';
@@ -109,8 +110,8 @@ class _SplashscreenState extends State<Splashscreen> {
   }
 
   _getCurrentLocation(){
-    double lat;
-    double long;
+   // double lat;
+    //double long;
     final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
     try{
       geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.best).then((Position position){
@@ -171,7 +172,7 @@ class button extends StatefulWidget {
 }
 
 class _buttonState extends State<button> {
-  Future<Album> _futureAlbum;
+  //Future<Album> _futureAlbum;
   //Position _currentPosition;
 
   @override
@@ -185,7 +186,7 @@ class _buttonState extends State<button> {
             style: TextStyle(
               fontSize: 40.0,
               fontWeight: FontWeight.bold,
-              color: Colors.blue[100],
+              color: Colors.blue[100]
             ),
           ),
           Text('New user?', style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold, color: Colors.blue[100],),),
@@ -228,12 +229,11 @@ class _buttonState extends State<button> {
               borderRadius: BorderRadius.circular(10.0),
             ),
             onPressed: () {
+              try{
               createAlbum(globales.currentPosition.latitude,globales.currentPosition.longitude);
               Navigator.push(
                   context, MaterialPageRoute(builder: (context) => Login()));
              // print("dissss:${globales.distance}");
-
-
               try {
                 double data = globales.distance;
                 double data_meter = data * 1000;
@@ -289,6 +289,7 @@ class _buttonState extends State<button> {
                 }
               }
               catch(e){
+                globales.distance =2.0;
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
@@ -307,8 +308,27 @@ class _buttonState extends State<button> {
                       ],);
                   },);
               }
-
-            },
+              }
+              catch(e){
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    // return object of type Dialog
+                    return AlertDialog(
+                      title: new Text("INFO"),
+                      content: Text("ON YOUE DEVICE LOCATION TO AND RESTART THE APP TO PROCEED.", style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.black,)),
+                      actions: <Widget>[
+                        // usually buttons at the bottom of the dialog
+                        new FlatButton(
+                          child: new Text("சரி"),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },),
+                      ],);
+                  },);
+              }
+              },
           ),
 
           Container(
@@ -350,9 +370,25 @@ class _buttonState extends State<button> {
         'long': longitude,
         }),
     );
+    /*if (response.statusCode == 200) {
+      var data = response.body;
+      var decodedData = jsonDecode(data);
+      print("data:$decodedData");//"status": "Success"
+      String postResult = decodedData['status'];
+      if (postResult == "Success") {
+        http.Response getResponse = await http.get('https://ceg-covid.herokuapp.com/latlong');
+        if (getResponse.statusCode == 200) {
+          var getData = getResponse.body;
+          var getDecodedData = jsonDecode(getData);
+          globales.distance = getDecodedData['value'];
+          print("dis:${globales.distance}");
+        }
+      }
+    }*/
+
     if(response.statusCode == 200){
       var data = jsonDecode(response.body);
-     globales.distance = data['result'];
+     //globales.distance = data['result'];
      globales.value = data['Result'];
        print("distance:${globales.distance}");
        print("value:${globales.value}");

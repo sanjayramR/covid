@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'InfoT.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'globals.dart'as globales;
+import 'package:frontend1db/KnowyourselfT.dart';
 
 
 class LoginT extends StatelessWidget {
@@ -15,8 +17,16 @@ class LoginT extends StatelessWidget {
     );
   }
 }
+class FullScreenPage extends StatefulWidget {
+  @override
+  _FullScreenPageState createState() => _FullScreenPageState();
+}
 
-class FullScreenPage extends StatelessWidget {
+class _FullScreenPageState extends State<FullScreenPage> {
+
+  FirebaseUser fbuser;
+  String userName;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,9 +62,10 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   final _auth = FirebaseAuth.instance;
   //final AuthService _auth = AuthService();
-  String email;
+  //String email;
   String password;
   String info;
+  final _fs = Firestore.instance;
   final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
@@ -83,7 +94,7 @@ class _HomeState extends State<Home> {
                 child: Container(
                   child: TextFormField(
                     onChanged: (val) {
-                      email = val;
+                      globales.email = val;
                     },
                     decoration: const InputDecoration(
                         icon: Icon(Icons.person, color: Colors.black, size: 40.0),
@@ -95,7 +106,7 @@ class _HomeState extends State<Home> {
                       Pattern pattern =
                           r'^([a-z0-9_\-\.]+)@([a-z.]+)\.([a-z]{2,5})$';
                       RegExp regex = new RegExp(pattern);
-                      if (!regex.hasMatch(email))
+                      if (!regex.hasMatch(globales.email))
                         return 'தவறான அஞ்சல் ஐடி';
                       else
                         return null;
@@ -150,12 +161,22 @@ class _HomeState extends State<Home> {
 
 
                     onPressed: ()async{
+                      Firestore.instance.collection('info').document('${globales.email}').collection('Activities').getDocuments().then((QuerySnapshot snapshot){
+                        globales.count=snapshot.documents[0]['count'];
+                        globales.name=snapshot.documents[0]['name'];
+                        globales.phoneNo=snapshot.documents[0]['phone'];
+                        globales.age=snapshot.documents[0]['age'];
+                        globales.occupation=snapshot.documents[0]['occupation'];
+                        globales.pincode=snapshot.documents[0]['pincode'];
+                        globales.sex=snapshot.documents[0]['sex'];
+                        globales.red=snapshot.documents[0]['red'];
+                      });
                       if(_formKey.currentState.validate()) {
                         dynamic newUser;
                         //DB validation
                         try {
                           newUser = await _auth.signInWithEmailAndPassword(
-                              email: email, password: password);
+                              email: globales.email, password: password);
                         }
                         catch(e)
                         {
@@ -167,13 +188,23 @@ class _HomeState extends State<Home> {
                           info = i.substring(startindex,finalindex);
                         }
                         if (newUser != null) {
+                          if(globales.count== '10')
+                          {
+                            globales.count='0';
+                          }
+                          if(globales.count == '0') {
+                            // print("count : $count");
+                            _fs.collection('info').document('${globales.email}').collection('Activities').document('Activity 1').setData({
+                              'count':globales.count,
+                              'red':globales.red,
+                            });
                           showDialog(
                             context: context,
                             builder: (BuildContext context) {
                               // return object of type Dialog
                               return AlertDialog(
                                 title: new Text("செய்தி"),
-                                content: new Text("உள்நுழைந்துள்ளீர் \n$email",),
+                                content: new Text("உள்நுழைந்துள்ளீர் \n${globales.email}",),
                                 actions: <Widget>[
                                   // usually buttons at the bottom of the dialog
                                   new FlatButton(
@@ -188,6 +219,62 @@ class _HomeState extends State<Home> {
                             context,
                             MaterialPageRoute(builder: (context) => InfoT()),
                           );
+                        }
+                          else
+                          {
+                            //double data = globales.distance;
+                            print(globales.distance);
+                            double data_meter = 2.0 * 1000;
+                            print("meterdistance:$data_meter");
+                            if (data_meter < 1.0) {
+                              //database
+                              Firestore.instance.collection('info').document(
+                                  '${globales.email}')
+                                  .collection('Activities')
+                                  .getDocuments()
+                                  .then((QuerySnapshot snapshot) {
+                                globales.red = snapshot.documents[0]['red'];
+                              });
+                              int r = int.parse(globales.red);
+                              r = r + 1;
+                              globales.red = r.toString();
+                            }
+                            int c = int.parse(globales.count);
+                            c=c+1;//print("intc:$c");
+                            globales.count = c.toString();
+                            _fs.collection('info').document('${globales.email}').collection('Activities').document('Activity 1').setData({
+                              'name': globales.name,
+                              'phone': globales.phoneNo,
+                              'age': globales.age,
+                              'occupation': globales.occupation,
+                              'pincode': globales.pincode,
+                              'sex': globales.sex,
+                              'count':globales.count,
+                              'red':globales.red,
+                            });
+
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                // return object of type Dialog
+                                return AlertDialog(
+                                  title: new Text("Message"),
+                                  content: new Text("Loged in as \n${globales.email}",),
+                                  actions: <Widget>[
+                                    // usually buttons at the bottom of the dialog
+                                    new FlatButton(
+                                      child: new Text("Ok"),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },),
+                                  ],);
+                              },);
+
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => KnowyourselfT()),
+                            );
+                          }
                         }
 
                         else if(info == "(ERROR_NETWORK_REQUEST_FAILED")
@@ -236,7 +323,7 @@ class _HomeState extends State<Home> {
                               // return object of type Dialog
                               return AlertDialog(
                                 title: new Text("செய்தி"),
-                                content: new Text("மன்னிக்கவும் \n$email இல்லை"),
+                                content: new Text("மன்னிக்கவும் \n${globales.email} இல்லை"),
                                 actions: <Widget>[
                                   // usually buttons at the bottom of the dialog
                                   new FlatButton(

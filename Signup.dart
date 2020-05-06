@@ -2,14 +2,19 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend1db/main.dart';
 //import 'package:speech_recognition/speech_recognition.dart';
 //import 'package:rflutter_alert/rflutter_alert.dart';
-import 'Login.dart';
+//import 'Login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+//import 'globals.dart' as globales;
 //import 'package:speech_recognition/speech_recognition.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'main.dart';
 
 class Signup extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -19,6 +24,7 @@ class Signup extends StatelessWidget {
 }
 
 class FullScreenPage extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,17 +61,12 @@ class _HomeState extends State<Home> {
   String password;
   String error;
   String info;
-
+  final _fs = Firestore.instance;
   final _formKey = GlobalKey<FormState>();
 
   @override
-
-
-
-
-
-  @override
   Widget build(BuildContext context) {
+
     return SingleChildScrollView(
       child: Center(
         child: Form(
@@ -169,8 +170,10 @@ class _HomeState extends State<Home> {
                     dynamic newUser;
                     if(_formKey.currentState.validate()) {
                       try {
+                        // globales.count=0;
                         newUser = await _auth.createUserWithEmailAndPassword(
-                            email: email, password: password);}
+                            email: email, password: password);
+                      }
                       catch (e) {
                         print(e);
                         newUser=null;
@@ -182,6 +185,10 @@ class _HomeState extends State<Home> {
                       }
 
                         if (newUser != null) {
+                          _fs.collection('info').document('$email').collection('Activities').document('Activity 1').setData({
+                            'count':'0',
+                            'red':'0',
+                          });
                            showDialog(
                               context: context,
                               builder: (BuildContext context) {
@@ -198,7 +205,7 @@ class _HomeState extends State<Home> {
                                    ],);},);
 
                           Navigator.push(context,
-                              MaterialPageRoute(builder: (context) => Login()));
+                              MaterialPageRoute(builder: (context) => FirstPage()));
                         }
 
                         else if(info == "(ERROR_NETWORK_REQUEST_FAILED")

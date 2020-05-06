@@ -2,11 +2,13 @@
 
 import 'package:flutter/material.dart';
 //import 'package:flutter/services.dart';
-import 'package:frontend1db/LoginT.dart';
+//import 'package:frontend1db/LoginT.dart';
+//import 'package:frontend1db/main.dart';
 //import 'package:rflutter_alert/rflutter_alert.dart';
-import 'LoginT.dart';
+import 'mainT.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SignupT extends StatelessWidget {
   @override
@@ -60,7 +62,9 @@ class _HomeState extends State<Home> {
   String password;
   String error;
   String info;
+  final _fs = Firestore.instance;
   final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -166,24 +170,13 @@ class _HomeState extends State<Home> {
                         final finalindex = i.indexOf(',');
                          info = i.substring(startindex,finalindex);
 
-                      /*  showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            // return object of type Dialog
-                            return AlertDialog(
-                              title: new Text("செய்தி"),
-                              content: new Text("மோசமான இணைய இணைப்பு"),
-                              actions: <Widget>[
-                                // usually buttons at the bottom of the dialog
-                                new FlatButton(
-                                  child: new Text("சரி"),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();},),
-                              ],);},);*/
-
                       }
 
                       if (newUser != null) {
+                        _fs.collection('info').document('$email').collection('Activities').document('Activity 1').setData({
+                          'count':'0',
+                          'red':'0',
+                        });
                         showDialog(
                           context: context,
                           builder: (BuildContext context) {
@@ -203,7 +196,7 @@ class _HomeState extends State<Home> {
                           },);
 
                         Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => LoginT()));
+                            MaterialPageRoute(builder: (context) => FirstPageT()));
                       }
 
 

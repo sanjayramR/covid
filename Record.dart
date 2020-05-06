@@ -6,6 +6,7 @@ import 'package:file/file.dart';
 import 'package:file/local.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:http/http.dart' as http;
 
 
 class Record extends StatefulWidget {
@@ -125,6 +126,22 @@ String info;
                 ],
               ),
     ),
+              Container(
+                padding:EdgeInsets.only(top:0.0,left: 0.0,right: 0.0,bottom: 0.0),
+                child: Column(
+                  children: <Widget>[
+                    RaisedButton(onPressed: (){
+                      uploadAudio(_recording.path);
+                    },
+                    child: Text('ok',
+                        style: TextStyle(
+                          fontSize: 20.0,
+                        ),),
+                    ),
+
+                  ],
+                ),
+              ),
             ]
         ),
 
@@ -137,8 +154,7 @@ String info;
         if (_controller.text != null && _controller.text != "") {
           String path = _controller.text;
           if (!_controller.text.contains('/')) {
-            io.Directory appDocDirectory =
-            await getApplicationDocumentsDirectory();
+            io.Directory appDocDirectory = await getApplicationDocumentsDirectory();
             path = appDocDirectory.path + '/' + _controller.text;
           }
           print("Start recording: $path");
@@ -149,7 +165,7 @@ String info;
         }
         bool isRecording = await AudioRecorder.isRecording;
         setState(() {
-          _recording = new Recording(duration: new Duration(), path: "");
+          _recording = new Recording(duration: new Duration(), path: _recording.path);
           _isRecording = isRecording;
         });
       } else {
@@ -179,9 +195,6 @@ String info;
             ],);},);
 
     }
-
-
-
   }
 
   _stop() async {
@@ -196,4 +209,25 @@ String info;
     });
     _controller.text = recording.path;
   }
+
+
+Future<String> uploadAudio(filepath) async {
+    var request = http.MultipartRequest('POST',Uri.parse('https://ceg-covid.herokuapp.com/audio',));
+    request.files.add(await http.MultipartFile.fromPath('audio', filepath));
+    var res = await request.send();
+    print(res);
+    final response = await http.get('https://ceg-covid.herokuapp.com/audio');
+
+   if(response.statusCode == 200)
+    {
+      print(response);
+    }
+    else
+      {
+        throw Exception("file not found");
+      }
+    //return res.reasonPhrase;
+}
+
+
 }

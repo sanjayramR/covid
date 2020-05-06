@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 //import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'QuestionsT.dart';
+import 'globals.dart' as globales;
 
 class InfoT extends StatelessWidget {
   @override
@@ -73,12 +74,8 @@ class _FormdetailsState extends State<Formdetails> {
 
 
   final _formKey = GlobalKey<FormState>();
-
   final _auth = FirebaseAuth.instance;
-  String name;
-  String phoneNo;
-  String age;
-  String occupation;
+
 
   @override
   Widget build(BuildContext context) {
@@ -106,7 +103,7 @@ class _FormdetailsState extends State<Formdetails> {
                   child: Container(
                     child: TextFormField(
                       onChanged: (val) {
-                        name = val;
+                        globales.name = val;
                       },
                       decoration: const InputDecoration(
                           icon: Icon(Icons.person, color: Colors.black, size: 30.0),
@@ -115,7 +112,7 @@ class _FormdetailsState extends State<Formdetails> {
                           labelText: 'உங்கள் பெயரை உள்ளிடவும்',
                           labelStyle: TextStyle(color: Colors.black)),
                       validator:(name){
-                        if (name.isEmpty)
+                        if (globales.name.isEmpty)
                           return 'தவறான பெயர்';
                         else
                           return null;
@@ -139,7 +136,7 @@ class _FormdetailsState extends State<Formdetails> {
                   child: Container(
                     child: TextFormField(
                       onChanged: (val) {
-                        phoneNo = val;
+                        globales.phoneNo = val;
                       },
                       decoration: const InputDecoration(
                           icon: Icon(Icons.phone, color: Colors.black, size: 30.0),
@@ -147,11 +144,11 @@ class _FormdetailsState extends State<Formdetails> {
                           hintStyle: TextStyle(color: Colors.black),
                           labelText: 'உங்கள் தொலைபேசி எண்',
                           labelStyle: TextStyle(color: Colors.black)),
-                      validator:(phoneNO){
+                      validator:(phoneno){
                         Pattern pattern =
                             r'^[ 0-9]+(?:[ _-][0-9]+)*$';
                         RegExp regex = new RegExp(pattern);
-                        if (!regex.hasMatch(phoneNO))
+                        if (!regex.hasMatch(phoneno))
                           return 'தவறான தொலைபேசி எண்';
                         else
                           return null;
@@ -177,7 +174,7 @@ class _FormdetailsState extends State<Formdetails> {
                   child: Container(
                     child: TextFormField(
                       onChanged: (val) {
-                        age = val;
+                        globales.age = val;
                       },
                       decoration: const InputDecoration(
                           icon: Icon(Icons.ac_unit, color: Colors.black, size: 30.0),
@@ -213,7 +210,7 @@ class _FormdetailsState extends State<Formdetails> {
                   child: Container(
                     child: TextFormField(
                       onChanged: (val) {
-                        occupation = val;
+                        globales.occupation = val;
                       },
                       decoration: const InputDecoration(
                           icon: Icon(Icons.work, color: Colors.black, size: 30.0,
@@ -233,6 +230,77 @@ class _FormdetailsState extends State<Formdetails> {
                   ),
                 ),
                 Container(
+                  //padding: EdgeInsets.all(20.0),
+                  padding: EdgeInsets.symmetric(horizontal: 25.0,vertical: 15.0),
+                  margin: EdgeInsets.only(top:0.0,bottom: 65.0,right:80.0),
+
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.7),
+                    border: Border.all(width: 1.0,color: Colors.black87),
+                    borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(20.0),
+                      bottomLeft: Radius.circular(20.0),
+                      bottomRight: Radius.circular(20.0),
+                    ),
+                  ),
+                  child: Container(
+                    child: TextFormField(
+                      onChanged: (val) {
+                        globales.pincode = val;
+                      },
+                      decoration: const InputDecoration(
+                          icon: Icon(Icons.work, color: Colors.black, size: 30.0,
+                          ),
+                          hintText: 'பின்கோட்',
+                          hintStyle: TextStyle(color: Colors.black),
+                          labelText: 'உங்கள் பின்கோட்',
+                          labelStyle: TextStyle(color: Colors.black)),
+                      validator:(pincode){
+                        if (pincode.isEmpty)
+                          return 'தவறான தொழில்';
+                        else
+                          return null;
+
+                      },
+                    ),
+                  ),
+                ),
+
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 25.0,vertical: 15.0),
+                  margin: EdgeInsets.only(top:0.0,bottom: 65.0,left:80.0),
+                  decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.7),
+                      border: Border.all(width: 1.0,color: Colors.black),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(20.0),
+                        bottomLeft: Radius.circular(20.0),
+                        bottomRight: Radius.circular(20.0),
+                      )
+                  ),
+                  child: Container(
+                    child: TextFormField(
+                      onChanged: (val) {
+                        globales.sex = val;
+                      },
+                      decoration: const InputDecoration(
+                          icon: Icon(Icons.work, color: Colors.black, size: 30.0,
+                          ),
+                          hintText: 'பாலினம்',
+                          hintStyle: TextStyle(color: Colors.black),
+                          labelText: 'உன் பாலினம்',
+                          labelStyle: TextStyle(color: Colors.black)),
+                      validator:(sex){
+                        if (sex.isEmpty)
+                          return 'தவறான தொழில்';
+                        else
+                          return null;
+
+                      },
+                    ),
+                  ),
+                ),
+                Container(
                   padding: EdgeInsets.only(left: 100.0, top: 40.0),
                   child: RaisedButton(
                     onPressed: () {
@@ -240,12 +308,35 @@ class _FormdetailsState extends State<Formdetails> {
                         Navigator.push(context,
                             MaterialPageRoute(builder: (context) => QuestionsT()));
                       }
+                      double data = globales.distance;
+                      print(globales.distance);
+                      double data_meter = data * 1000;
+                      print("meterdistance:$data_meter");
+                      //String i=data_meter.toString();
+                      if (data_meter < 1.0) {
+                        //database
+                        Firestore.instance.collection('info').document(
+                            '${globales.email}')
+                            .collection('Activities')
+                            .getDocuments()
+                            .then((QuerySnapshot snapshot) {
+                          globales.red = snapshot.documents[0]['red'];
+                        });
+                        int r = int.parse(globales.red);
+                        r = r + 1;
+                        globales.red = r.toString();
+                      }
+
                       _fs.collection('info').document('$userName').collection('Activities').document('Activity 1').setData({
                         //'email': userName,
-                        'name': name,
-                        'phone': phoneNo,
-                        'age': age,
-                        'occupation': occupation,
+                        'name': globales.name,
+                        'phone': globales.phoneNo,
+                        'age': globales.age,
+                        'occupation': globales.occupation,
+                        'pincode': globales.pincode,
+                        'sex': globales.sex,
+                        'red':globales.red,
+                        'count':'1',
                       });
                     },
                     child: Text(
